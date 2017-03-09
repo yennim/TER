@@ -1,2 +1,1 @@
-# TER
-##Project supervised by our lord Fabien Benureau
+# TER - Prise de Decision
