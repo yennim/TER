@@ -19,7 +19,7 @@ import numpy as np
 # ==============================================================================
 
 T = 5
-N = 30 #time steps occurrence
+N = 10 #time steps occurrence
 h = T/N #time step scale
 gamma = 0.98 #discount factor
 alpha = 0.05 #learning rate
@@ -64,16 +64,18 @@ for t in range(N):
         w[i][t] +=  delta_w[i][t] #weights update
         
 # === Trials ===
-trials = 2
+trials = 5
 for j in range(trials):
     x = [[0 for t in range(N)] for i in range(k)]
     r = [0 for t in range(N)]
 
-    r[20] = 1
+    x[0][5] = 1
+    r[6] = 1
+    q = 5
     
     # action
     for t in range(N):
-        for i in range(k):          
+        for i in range(k):
             pl[i][t] = x[i][t] * w[i][t] #reward predictions
             P[t] += pl[i][t]
             
@@ -84,12 +86,13 @@ for j in range(trials):
             delta[t] = r[t] - TD[t]
             
             delta_w[i][t] = alpha * delta[t] * e[i][t]
-            w[i][t] += delta_w[i][t]
+            w[i][q] += delta_w[i][t]
 
 for i in range(N):
     if r[i] != 0: print("r", i*h, r[i])
     if w[0][i] != 0: print("w", i*h, w[0][i])
     if x[0][i] != 0: print("x", i*h, x[0][i])
+    if e[0][i] != 0: print("e", i*h, e[0][i])
     if delta[i] != 0: print("prediction error", i*h,delta[i])
 
 #test function to try it.
