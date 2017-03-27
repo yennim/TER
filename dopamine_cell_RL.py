@@ -19,14 +19,14 @@ import numpy as np
 # ==============================================================================
 
 T = 5
-N = 50 #time steps occurrence
+N = 30 #time steps occurrence
 h = T/N #time step scale
 gamma = 0.98 #discount factor
-alpha = 0.5 #learning rate
-lamb = 0.9 #eligibility trace parameter
+alpha = 0.05 #learning rate
+lamb = 0 #eligibility trace parameter
 
 # === Initialisation ===
-k = 1 #stimuli occurrence
+k = 1 #stimuli occurrence >= 1, even for no stimulus
 x = [[0 for t in range(N)] for i in range(k)] #state vectors of the stimuli, between 0.5 to 2 seconds
 w = [[0 for t in range(N)] for i in range(k)] #weights vector per stimulus
 r = [0 for t in range(N)] #reward
@@ -38,7 +38,6 @@ if k > 1:
     for t in range(N):
         for i in range(1,k): #begin at 1 <-- P = pl[0]
             P[t] += pl[i][t]
-
 
 # === Temporal difference ===
 TD = [0]
@@ -65,15 +64,12 @@ for t in range(N):
         w[i][t] +=  delta_w[i][t] #weights update
         
 # === Trials ===
-trials = 50
+trials = 2
 for j in range(trials):
     x = [[0 for t in range(N)] for i in range(k)]
     r = [0 for t in range(N)]
-        
-    for i in range(k):
-        stimulus = randint(5,35)
-        x[i][stimulus] = 1
-        r[stimulus + 10] = 1
+
+    r[20] = 1
     
     # action
     for t in range(N):
@@ -92,7 +88,7 @@ for j in range(trials):
 
 for i in range(N):
     if r[i] != 0: print("r", i*h, r[i])
-    #if w[0][i] != 0: print("w", i*h, w[0][i])
+    if w[0][i] != 0: print("w", i*h, w[0][i])
     if x[0][i] != 0: print("x", i*h, x[0][i])
     if delta[i] != 0: print("prediction error", i*h,delta[i])
 
