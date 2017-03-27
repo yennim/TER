@@ -65,7 +65,7 @@ for t in range(N):
         w[i][t] +=  delta_w[i][t] #weights update
         
 # === Trials ===
-trials = 5
+trials = 50
 for j in range(trials):
     x = [[0 for t in range(N)] for i in range(k)]
     r = [0 for t in range(N)]
@@ -95,6 +95,9 @@ for i in range(N):
     #if w[0][i] != 0: print("w", i*h, w[0][i])
     if x[0][i] != 0: print("x", i*h, x[0][i])
     if delta[i] != 0: print("prediction error", i*h,delta[i])
+
+#test function to try it.
+
 
 axisx = np.arange(0,T,h)
 plt.plot(axisx, delta, 'b', axisx, r, 'ro', axisx, x[0], 'go')
