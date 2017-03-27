@@ -71,11 +71,14 @@ for j in range(trials):
 
     x[0][5] = 1
     r[6] = 1
-    q = 5
+    q = [0 for i in range(k)]
     
     # action
     for t in range(N):
         for i in range(k):
+            if x[i][t] == 1:
+                q[i] = t
+            
             pl[i][t] = x[i][t] * w[i][t] #reward predictions
             P[t] += pl[i][t]
             
@@ -86,7 +89,7 @@ for j in range(trials):
             delta[t] = r[t] - TD[t]
             
             delta_w[i][t] = alpha * delta[t] * e[i][t]
-            w[i][q] += delta_w[i][t]
+            w[i][q[i]] += delta_w[i][t]
 
 for i in range(N):
     if r[i] != 0: print("r", i*h, r[i])
@@ -99,7 +102,8 @@ for i in range(N):
 
 
 axisx = np.arange(0,T,h)
-plt.plot(axisx, delta, 'b', axisx, r, 'ro', axisx, x[0], 'go')
+plt.plot(axisx, delta, 'k', linewidth=4)
+plt.plot(axisx, r, 'ro', axisx, x[0], 'go')
 # axes limits
 axes = plt.gca()
 axes.set_ylim([0, 3])
