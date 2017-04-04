@@ -18,11 +18,11 @@ import numpy as np
 # ==============================================================================
 
 T = 5
-N = 25 #time steps occurrence
+N = 21 #time steps occurrence
 h = T/N #time step scale
 gamma = 0.98 #discount factor
-alpha = 0.005 #learning rate
-lamb = 0.9 #eligibility trace parameter
+alpha = 0.05 #learning rate
+lamb = 0 #eligibility trace parameter
 
 # === Initialisation ===
 k = 2 #stimuli occurrence. It has to be >= 1, even for no stimulus
@@ -31,43 +31,27 @@ w = [[0 for t in range(N)] for i in range(k)] #weights vector per stimulus
 r = [0 for t in range(N)] #reward
 
 # === Reward prediction ===
-pl = [[x[i][t]*w[i][t] for t in range(N)] for i in range(k)] #reward predictions
+pl = [[0 for t in range(N)] for i in range(k)] #reward predictions
 P = [0 for t in range(N)] #total reward prediction
-if k > 1:
-    for t in range(N):
-        for i in range(1,k): #begin at 1 <-- P = pl[0]
-            P[t] += pl[i][t]
 
 # === Temporal difference ===
-TD = [0]
-for t in range(1,N):
-    TD.append(P[t-1] - gamma*P[t])
-
+TD = [0 for t in range(N)]
 
 # === Prediction error ===
-delta = [(r[t] - TD[t]) for t in range(N)]
-
+delta = [0 for t in range(N)]
 
 # === Eligibility trace ===
-e = [[0] for i in range(k)]
-
-for t in range(1,N):
-    for i in range(k):
-        e[i].append(lamb*e[i][t-1] + x[i][t-1])
+e = [[0 for t in range(N)] for i in range(k)]
 
 # === Weight change ===
-delta_w = [[alpha * delta[t] * e[i][t] for t in range(N)] for i in range(k)] #the last time step is ignored
-
-for t in range(N):
-    for i in range(k):
-        w[i][t] +=  delta_w[i][t] #weights update    
-
+delta_w = [[0 for t in range(N)] for i in range(k)] #the last time step is ignored
 
 # === Trials ===
-trials = 400
+trials = 100
 for j in range(trials):
     x = [[0 for t in range(N)] for i in range(k)]
     r = [0 for t in range(N)]
+    e = [[0 for t in range(N)] for i in range(k)]
 
     s = [5, 15]
     r[20] = 1
@@ -121,14 +105,15 @@ for j in range(trials):
         if k == 2:
             delta_w[1] = np.multiply(alpha * delta[t], e[1])
             w[1] = np.add(w[1], delta_w[1])
+            
 ##        print("deltawx%s=%s" % (t, delta_w[0]))
 ##        print("deltawy%s=%s" % (t, delta_w[1]))
 ##        print("wx%s=%s" % (t, w[0]))
 ##        print("wy%s=%s" % (t, w[1]))
 ##        print("")
-
 ##print("ce qu'on veut 1:", 2*(alpha**2)*gamma)
 ##print("ce qu'on veut 2:", (2*alpha)-(2*(alpha**2)))
+            
 for i in range(N):
 ##    if r[i] != 0: print("r", i*h, r[i])
 ##    if w[0][i] != 0: print("w0", i*h, w[0][i])
@@ -146,7 +131,6 @@ plt.plot(axisx, delta, 'k', linewidth=4)
 plt.plot(s[0]*h, 1, 'go')
 plt.plot(axisx, r, 'ro')
 if k > 1:
-    print("k>1")
     plt.plot(s[1]*h, 1, 'go')
 # axes limits
 axes = plt.gca()
