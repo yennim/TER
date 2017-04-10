@@ -9,11 +9,10 @@ from matplotlib import pyplot as plt
 from random import *
 import numpy as np
 
-##from __future__ import division
-
-##from bokeh.core.properties import Any, Dict, Instance, String
-##from bokeh.io import show
-##from bokeh.models import ColumnDataSource, Div, Column,  LayoutDOM
+from bokeh.core.properties import Any, Dict, Instance, String
+from bokeh.models import ColumnDataSource, Div, Column,  LayoutDOM
+from bokeh.plotting import figure, output_file, show
+from bokeh.io import show
 
 # ==============================================================================
 
@@ -118,15 +117,14 @@ for i in range(N):
 #test function to try it.
 
 axisx = np.arange(0,T,h)
-plt.plot(axisx, delta, 'k', linewidth=4)
-plt.plot(s[0]*h, 1, 'go')
-plt.plot(axisx, r, 'ro')
-if k > 1:
-    plt.plot(s[1]*h, 1, 'go')
-# axes limits
-axes = plt.gca()
-axes.set_ylim([0, 2])
-plt.show()
+p = figure(title="TD(0) Model", x_axis_label="Time step", y_axis_label="Prediction error", y_range=[0, 1.5], plot_width=400, plot_height=300)
+p.line(axisx, delta, line_width=4)
+p.circle(20*h, 1, size=4, line_color="red", fill_color="red")
+if len(s)!=0:
+    p.circle(s[0]*h, 1, size=4, line_color="#56BA1B", fill_color="#56BA1B")
+if len(s)!=0 and k == 2:
+    p.circle(s[1]*h, 1, size=4, line_color="#56BA1B", fill_color="#56BA1B")
+show(p)
             
             
             
