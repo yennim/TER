@@ -18,9 +18,9 @@ import numpy as np
 T = 5
 N = 23 # time steps occurrence
 h = T/N # time step scale
-gamma = 0.98 # discount factor
-alpha = 0.005 # learning rate
-lamb = 0.9 # eligibility trace parameter
+γ = 0.98 # discount factor
+α = 0.005 # learning rate
+λ = 0.9 # eligibility trace parameter
 
 # === Initialisation ===
 k = 2 # stimuli occurrence. It has to be >= 1, even for no stimulus
@@ -31,15 +31,16 @@ w = [[0 for t in range(N)] for i in range(k)] # weights vector per stimulus
 pl = [[0 for t in range(N)] for i in range(k)] # Reward predictions
 P = [0 for t in range(N)] # Total reward prediction
 TD = [0 for t in range(N)] # Temporal difference
-delta = [0.0 for t in range(N)] # Prediction error
+δ = [0.0 for t in range(N)] # Prediction error
 e = [[0 for t in range(N)] for i in range(k)]# Eligibility trace
-delta_w = [[0.0 for t in range(N)] for i in range(k)] # Weight change
+Δw = [[0.0 for t in range(N)] for i in range(k)] # Weight change
 
-delta_plot = [] # to store delta's vectors
-delta_temp = [0.0 for t in range(N)]
+δ_plot = [] # to store δ's vectors
+δ_temp = [0.0 for t in range(N)]
 # === Trials ===
 trials = 500
 for j in range(trials):
+    
     x = [[0 for t in range(N)] for i in range(k)]
     r = [0 for t in range(N)]
     e = [[0 for t in range(N)] for i in range(k)]
@@ -49,9 +50,9 @@ for j in range(trials):
 
     # action
     for t in range(N):
-        if t >= 1: # ==0 at t=0, either way it isn't an N-sized list
-            e[0] = np.multiply(e[0],lamb)
-            e[0] = np.add(e[0],x[0])
+        # =0 at t=0, either way it isn't an N-sized list
+        e[0] = np.multiply(e[0],λ)
+        e[0] = np.add(e[0],x[0])
 
         if t == s[0]:
             x[0][q[0]] = 1
@@ -65,7 +66,7 @@ for j in range(trials):
         P[t] = np.sum(pl[0])
         
         if k == 2:
-            e[1] = np.multiply(e[1],lamb)
+            e[1] = np.multiply(e[1],λ)
             e[1] = np.add(e[1],x[1])
             if t == s[1]:
                 x[1][q[1]] = 1        
@@ -79,20 +80,35 @@ for j in range(trials):
             P[t] += np.sum(pl[1])
    
         if t >= 1: # ==0 at t=0, either way it isn't an N-sized list
-            TD[t] =  P[t-1] - gamma * P[t] # <0 when predicts a reward at time step t+1
+            TD[t] =  P[t-1] - γ * P[t] # <0 when predicts a reward at time step t+1
         
-        delta[t] = float(r[t] - TD[t])
+        δ[t] = r[t] - TD[t]
+        if δ[t] > 1 : δ[t] = 1
+        if δ[t] < -0.05 : δ[t] = -0.05
         
-        delta_w[0] = np.multiply(alpha * delta[t], e[0])
-        w[0] = np.add(w[0], delta_w[0])
+        Δw[0] = np.multiply(α * δ[t], e[0])
+        w[0] = np.add(w[0], Δw[0])
         if k == 2:
-            delta_w[1] = np.multiply(alpha * delta[t], e[1])
-            w[1] = np.add(w[1], delta_w[1])
-##    delta_temp = delta.copy()
-##    delta_plot.append(delta_temp)
+            Δw[1] = np.multiply(α * δ[t], e[1])
+            w[1] = np.add(w[1], Δw[1])
+
+        if t == N-1 :
+            e[0] = np.multiply(e[0],λ)
+            e[0] = np.add(e[0],x[0])
+            if k == 2:
+                e[1] = np.multiply(e[1],λ)
+                e[1] = np.add(e[1],x[1])
+                
+   # print(e[0])
+    #print(e[1])
+##    δ_temp = δ.copy()
+##    δ_plot.append(δ_temp)
+    #print(e)
     if j%10 == 0:
-        delta_temp = delta.copy()
-        delta_plot.append(delta_temp)
+        δ_temp = δ.copy()
+        δ_plot.append(δ_temp)
+
+print(δ)
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
@@ -101,9 +117,9 @@ X = np.arange(0,T,h)
 Y = np.arange(0,trials,10)
 X, Y = np.meshgrid(X, Y)
 
-surface = ax.plot_surface(X, Y, delta_plot, cmap=cm.magma, linewidth=0)
+surface = ax.plot_surface(X, Y, δ_plot, cmap=cm.magma, linewidth=0)
 
-ax.set_zlim(0, 1.01)
+ax.set_zlim(-0.05, 1.01)
 ax.zaxis.set_major_locator(LinearLocator(10))
 ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 fig.colorbar(surface, shrink=0.5, aspect=5)
