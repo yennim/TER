@@ -15,7 +15,7 @@ import numpy as np
 import model
 
 # ==============================================================================
-n_trials = 100
+n_trials = 500
 
 T = 5
 N = 23 # time steps occurrence
@@ -28,7 +28,7 @@ N = 23 # time steps occurrence
 tdmodel = model.TDModel(λ=λ, α=α, γ=γ, N=N, T=T)
 for _ in range(n_trials):
     tdmodel.trial()
-tdmodel.trial(True, False)
+tdmodel.trial([True, False])
             
 # plotting
 X = np.arange(0,T,T/N)
