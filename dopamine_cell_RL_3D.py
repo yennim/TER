@@ -15,13 +15,13 @@ import numpy as np
 import model
 # ==============================================================================
 
-n_trials = 500
+n_trials = 800
 
 T = 5
 N = 23 # time steps occurrence
 γ = 0.98 # discount factor
+λ = 0 # eligibility trace parameter
 α = 0.005 # learning rate
-λ = 0.9 # eligibility trace parameter
 
 # running the model
 tdmodel = model.TDModel(λ=λ, α=α, γ=γ, N=N, T=T)
