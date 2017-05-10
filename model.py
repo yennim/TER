@@ -32,8 +32,8 @@ class TDModel:
         r   = [ 0.0 for t in range(self.N)] # rewards vector
         x   = np.array([[[0.0 for t in range(self.N)] for _ in range(self.N)] for i in range(self.k)])# Stimuli state vectors
         e   = np.array([[0.0 for t in range(self.N)] for i in range(self.k)]) # Eligibility trace vector
-        s   = [] # stimulus time
-
+        vecteur = np.array([1 for t in range(self.N)])
+        
         # stimuli affectation
         for (x_l, s_t, s_present) in zip(x, self.stimuli, stim):
             if s_present:
@@ -48,24 +48,24 @@ class TDModel:
             for i in range(self.k):
                 P_l[i] = np.dot(x[i][t], self.w[i])
                 P[t] += P_l[i]
-                if t > 0:
-                    e[i] = self.λ * e[i] + x[i][t-1]
 
             if t > 0: # ==0 at t=0, either way it isn't an N-sized list
                 TD[t] =  P[t-1] - self.γ * P[t] # <0 when predicts a reward at time step t+1
-
+            #print(TD[t])
             δ[t] = r[t] - TD[t]
             δ[t] = min(1.0, max(-0.05, δ[t]))
 
             for i in range(self.k):
+                if t > 0:
+                    if self.λ == 1:
+                        #isolate the case λ=1
+                        e[i] = self.γ * self.λ * (e[i] + vecteur)
+                    else:
+                        e[i] = self.λ * e[i] + x[i][t-1]
+
                 Δw[i] = self.α * δ[t] * e[i]
                 self.w[i] += Δw[i]
 
-##            print("e",e)
-##            print("w",self.w)
-##            print("δ",δ)
-##            print("P",P)
-##            print("\n")
         self.δ_history.append(δ.copy())
-
+        
         return e
