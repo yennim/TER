@@ -1,32 +1,27 @@
 import numpy as np
 
-
-
-    ## 3D graphs with Matplotlib
-
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-from matplotlib.ticker import FixedLocator, LinearLocator, FormatStrFormatter
 
 
-def δ_3d(model, ax=None, show=True, figsize=(10, 8)):
+def δ_3d(model, ax=None, show=True, figsize=(10, 6), filename=None):
     X = np.arange(0, model.T, model.T/model.N)
     Y = np.arange(0, len(model.δ_history))
     Z = model.δ_history
 
-    return surface3d(X, Y, Z, ax=ax, show=show, figsize=figsize)
+    return surface3d(X, Y, Z, ax=ax, show=show, figsize=figsize, filename=filename)
 
 
-def surface3d(X, Y, Z, ax=None, show=True, figsize=(10, 8)):
+def surface3d(X, Y, Z, ax=None, show=True, figsize=(10, 8), filename=None):
     if ax is None:
         fig = plt.figure(figsize=figsize)
         ax = fig.gca(projection='3d')
 
     XX, YY = np.meshgrid(X, Y)
 
-    surface = ax.plot_surface(XX, YY, Z, cmap=cm.Spectral_r, linewidth=0)
+    ax.view_init(azim=-54, elev=35)
+    surface = ax.plot_surface(XX, YY, Z, cmap=mpl.cm.Spectral_r, linewidth=0)
 
     for child in ax.get_children():
         if isinstance(child, mpl.spines.Spine):
@@ -49,10 +44,14 @@ def surface3d(X, Y, Z, ax=None, show=True, figsize=(10, 8)):
     ax.set_xlim(X[0], X[-1])
     #ax.xaxis.get_major_formatter().set_useOffset(False)
     #ax.yaxis.get_major_formatter().set_useOffset(False)
-    ax.yaxis.set_major_locator(LinearLocator(5))
-    ax.zaxis.set_major_locator(FixedLocator((0.0, 0.5, 1.0)))
-    ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
-    #fig.colorbar(surface, shrink=0.5, aspect=5)
+    ax.yaxis.set_major_locator(mpl.ticker.LinearLocator(5))
+    ax.zaxis.set_major_locator(mpl.ticker.FixedLocator((0.0, 0.5, 1.0)))
+    ax.zaxis.set_major_formatter(mpl.ticker.FormatStrFormatter('%.02f'))
+
+    if filename is not None:
+        plt.tight_layout()
+        print('figures/{}.pdf'.format(filename))
+        plt.savefig('figures/{}.pdf'.format(filename))
 
     if show:
         plt.show()
