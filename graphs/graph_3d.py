@@ -20,7 +20,7 @@ def surface3d(X, Y, Z, ax=None, show=True, figsize=(10, 8), filename=None):
 
     XX, YY = np.meshgrid(X, Y)
 
-    ax.view_init(azim=-54, elev=35)
+    ax.view_init(azim=-51, elev=35)
     surface = ax.plot_surface(XX, YY, Z, cmap=mpl.cm.Spectral_r, linewidth=0)
 
     for child in ax.get_children():
@@ -50,7 +50,6 @@ def surface3d(X, Y, Z, ax=None, show=True, figsize=(10, 8), filename=None):
 
     if filename is not None:
         plt.tight_layout()
-        print('figures/{}.pdf'.format(filename))
         plt.savefig('figures/{}.pdf'.format(filename))
 
     if show:
