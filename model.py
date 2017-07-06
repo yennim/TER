@@ -64,11 +64,8 @@ class TDModel:
             δ[t] = min(1.0, max(-0.05, δ[t]))
 
             for l in range(self.k):
-                if t > 0:  # t=0 : x[i][t-1] doesn't exist
-                    if self.λ == 1:  # case λ=1 isolated...
-                        e[l] = self.γ * self.λ * (e[l] + ones)
-                    else:
-                        e[l] = self.λ * e[l] + x[l][t-1]
+                if t > 0:
+                    e[l] = self.λ * e[l] + x[l][t-1]
 
                 Δw_l_t = self.α * δ[t] * e[l]
                 self.w[l] += Δw_l_t
