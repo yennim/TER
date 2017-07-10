@@ -27,22 +27,20 @@ class TDModel:
         """Compute stimuli and reward vectors."""
         # stimuli affectation
         x = np.zeros((self.k, self.N, self.N))
-        for (x_l, s_t, s_present) in zip(x, self.stimuli, stim):
-            if s_present:
+        for (x_l, t_l, l_present) in zip(x, self.stimuli, stim):
+            if l_present:
                 for t in range(self.N):
-                    if s_t <= t+1:
-                        x_l[t][t-s_t] = 1
+                    if t_l <= t + 1:
+                        x_l[t][t - t_l] = 1
         # rewards affectation
         r         = np.zeros(self.N)
-        r[reward] = 1  # reward
+        r[reward] = 1
 
         return x, r
 
 
     def trial(self, stim=(True, True), reward=20):
         """Compute a trial"""
-        ones = np.ones(self.N)
-
         P    = np.zeros(self.N)            # total reward prediction
         δ    = np.zeros(self.N)            # prediction error
         e    = np.zeros((self.k, self.N))  # eligibility trace vector
@@ -65,7 +63,7 @@ class TDModel:
 
             for l in range(self.k):
                 if t > 0:
-                    e[l] = self.λ * e[l] + x[l][t-1]
+                    e[l] = self.λ * e[l] + x[l][t - 1]
 
                 Δw_l_t = self.α * δ[t] * e[l]
                 self.w[l] += Δw_l_t
