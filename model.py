@@ -11,8 +11,8 @@ class TDModel:
                        α=0.005,           # learning rate
                        γ=0.98,            # discount factor
                        N=23,              # number of time steps
-                       T=5,
-                       stimuli=[5, 15]):  # trial duration
+                       T=5,               # trial duration
+                       stimuli=[5, 15]):  # stimuli's time steps
         self.λ, self.α, self.γ = λ, α, γ
         self.N, self.T = N, T
 
@@ -20,7 +20,7 @@ class TDModel:
         self.stimuli  = stimuli
 
         self.w = np.zeros((self.k, self.N))  # weights vector per stimulus
-        self.δ_history = []  # to store the history of δ
+        self.δ_history = []  # store the history of δ
 
 
     def compute_task(self, stim=(True, True), reward=20):
@@ -41,7 +41,6 @@ class TDModel:
 
     def trial(self, stim=(True, True), reward=20):
         """Compute a trial"""
-        ones = np.ones(self.N)
 
         P    = np.zeros(self.N)            # total reward prediction
         δ    = np.zeros(self.N)            # prediction error
@@ -52,16 +51,16 @@ class TDModel:
         # actual trial
         for t in range(self.N):
             for l in range(self.k):
-                P_l = np.dot(x[l][t], self.w[l])
+                P_l = np.dot(x[l][t], self.w[l]) # reward prediction per stimulus
                 P[t] += P_l
 
-            if t > 0:  # TD[t] == 0 at t = 0 : P[t-1] doesn't exist
-                TD_t = P[t-1] - self.γ * P[t]  # <0 when predicts a reward at time step t+1
+            if t > 0:   
+                TD_t = P[t-1] - self.γ * P[t]
             else:
                 TD_t = 0
 
             δ[t] = r[t] - TD_t
-            δ[t] = min(1.0, max(-0.05, δ[t]))
+            δ[t] = min(1.0, max(-0.05, δ[t]))   # prediction error limited from -0.05 to 1
 
             for l in range(self.k):
                 if t > 0:
@@ -71,4 +70,3 @@ class TDModel:
                 self.w[l] += Δw_l_t
 
         self.δ_history.append(δ.copy())
-        return e
